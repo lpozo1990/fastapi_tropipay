@@ -1,5 +1,7 @@
 import os
+from typing import List
 from fastapi import FastAPI, HTTPException, Header
+from pydantic import BaseModel, EmailStr
 import requests
 from dotenv import load_dotenv
 
@@ -82,3 +84,52 @@ async def get_payment_link(
 
     result = response.json()
     return result
+
+
+class Client(BaseModel):
+    name: str
+    lastName: str
+    address: str
+    phone: str
+    email: EmailStr
+    countryId: int
+    termsAndConditions: bool
+
+
+class Payload(BaseModel):
+    reference: str
+    concept: str
+    favorite: bool
+    description: str
+    amount: int
+    currency: str
+    singleUse: bool
+    reasonId: int
+    expirationDays: int
+    lang: str
+    urlSuccess: str
+    urlFailed: str
+    urlNotification: str
+    serviceDate: str
+    client: Client
+    directPayment: bool
+    paymentMethods: List[str]
+
+
+@app.post("/create_payment_card")
+async def create_payment_card(
+    Authorization: str = Header(...), payload: Payload = None
+):
+    url = "https://tropipay-dev.herokuapp.com/api/v2/paymentcards"
+
+    payload = payload.model_dump()
+    headers = {
+        "Authorization": Authorization,
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+    }
+
+    response = requests.post(url, json=payload, headers=headers)
+    result = response.json()
+    short_url = result.get("shortUrl")
+    return short_url
