@@ -7,7 +7,7 @@ from models.PaymentCard import Payload
 router = APIRouter()
 
 
-@router.post("/create_payment_card")
+@router.post("/create_payment_card", tags=["payments"])
 async def create_payment_card(
     Authorization: str = Header(...), payload: Payload = None
 ):

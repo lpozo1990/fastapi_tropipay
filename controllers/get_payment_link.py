@@ -5,7 +5,7 @@ import requests
 router = APIRouter()
 
 
-@router.post("/get_payment_link")
+@router.post("/get_payment_link", tags=["payments"])
 async def get_payment_link(
     Authorization: str = Header(...), Securitycode: str = Header(...)
 ):
